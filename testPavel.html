@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <style>
+    .drop-file {
+        width: 300px;
+        height: 200px;
+        background: rgb(243, 238, 165);
+        display: block;
+        position: relative;
+        padding: 30px;
+        text-align: center;
+    }
+    .drop-file:hover {
+        background: rgb(175, 166, 39);
+    }
+    .dfile {
+        width: 300px;
+        height: 200px;
+        padding: 30px;
+        opacity: 0;
+        position: absolute;
+        cursor: pointer;
+        background: rgb(243, 238, 165);
+    }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h4>Comment</h4>
+        <textarea v-model="comment"></textarea>
+        <br/><br/><br/>
+        file: 
+              <span @click="$refs.files.click()" style="padding: 10px; background: rgb(5, 30, 100); color:#eee;cursor:pointer">Upload tracks</span>
+              <br/><br/><br/>
+              <span class="drop-file">
+                   <input class="dfile" id="file" @change="onFileChange" ref="files" type="file" placeholder="Drop file">
+                   Drop file
+                </span>
+              <br/><br/><br/>
+              <span v-if="!img || name">{{name}}</span>
+              <span v-if="img || !name"><img :src="file" style="max-width: 150px;"></span>
+        
+      </div>
+
+      <script> 
+      const app = new Vue({
+            el:'#app',
+            data:{
+                comment:'',
+                file: '',
+                img: false,
+                name: ''
+            },
+            mounted() {
+                if(localStorage.comment) this.comment = localStorage.comment;
+                if(localStorage.file) this.file = localStorage.file;
+                if(localStorage.name) this.name = localStorage.name;
+            },
+            watch:{
+                file(file) {
+                  localStorage.file = file;
+                },
+                comment(comment) {
+                  localStorage.comment = comment;
+                },
+                name(name) {
+                   localStorage.name = name;
+                }
+            },
+            methods: {
+                onFileChange(e) {
+                    this.file = '';
+                    this.name = '';
+                    const files = e.target.files || e.dataTransfer.files
+                    if (!files.length) {
+                    return
+                    }
+                    this.pFile(files[0])
+                },
+                pFile(file) {
+                    const reader = new FileReader()
+                    const vm = this
+                    if(file.type === 'image/png' || file.type === 'image/jpg') {
+                        console.log(file.type)
+                        this.img = true
+                    } else {
+                        this.img = false
+                        this.name = file.name
+                    }
+                    reader.onload = (e) => {
+                    vm.file = e.target.result
+                    }
+                    reader.readAsDataURL(file)
+                }
+            }
+            
+            })
+      
+      
+      </script>
+</body>
+</html>
